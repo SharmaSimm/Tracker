@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/editTextDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/date_e_g_2023_10_31" />
+
+    <EditText
+        android:id="@+id/editTextSymptoms"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/symptoms" />
+
+    <EditText
+        android:id="@+id/editTextMood"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/mood" />
+
+    <Button
+        android:id="@+id/buttonSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/save_entry" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewEntries"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical" />
+
+</LinearLayout>

@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">MyPeriodTracker</string>
+    <string name="date_e_g_2023_10_31">Date (e.g., 2023-10-31)</string>
+    <string name="symptoms">Symptoms</string>
+    <string name="mood">Mood</string>
+    <string name="save_entry">Save Entry</string>
+    <string name="health_trends">Health Trends</string>
+    <string name="average_mood">Average Mood:</string>
+    <string name="most_common_symptoms">Most Common Symptoms:</string>
+    <string name="average_symptoms_per_entry">Average Symptoms per Entry:</string>
+    <string name="trend_information">Trend Information:</string>
+    <string name="back_to_home">Back to Home</string>
+</resources>

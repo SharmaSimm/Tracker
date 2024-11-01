@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="textViewDate" type="id">textViewDate</item>
+    <item name="textViewSymptoms" type="id">textViewSymptoms</item>
+    <item name="textViewMood" type="id">textViewMood</item>
+</resources>
