@@ -9,19 +9,27 @@
         android:id="@+id/editTextDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/date_e_g_2023_10_31" />
+        android:hint="@string/date_e_g_2023_10_31"
+        android:minHeight="48dp" />
 
     <EditText
         android:id="@+id/editTextSymptoms"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/symptoms" />
+        android:hint="@string/symptoms"
+        android:minHeight="48dp" />
 
     <EditText
         android:id="@+id/editTextMood"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/mood" />
+        android:hint="@string/mood"
+        android:minHeight="48dp" />
+    <Button
+        android:id="@+id/buttonCapturePhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Capture Photo" />
 
     <Button
         android:id="@+id/buttonSave"

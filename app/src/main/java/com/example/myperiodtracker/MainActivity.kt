@@ -1,51 +1,106 @@
-package com.example.myperiodtracker
+package com.example.periodtracker
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.provider.MediaStore
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myperiodtracker.ui.theme.MyPeriodTrackerTheme
+import com.example.myperiodtracker.databinding.ActivityMainBinding
+import com.example.periodtracker.databinding.ActivityMainBinding
+import com.example.periodtracker.databinding.ListItemPhotoBinding
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var databaseHelper: DatabaseHelper
+
+    private lateinit var binding: ActivityMainBinding
+    private var currentPhotoPath: String? = null
+    private val photoList = mutableListOf<String>()
+    private lateinit var photoAdapter: PhotoAdapter
+
+    companion object {
+        private const val REQUEST_IMAGE_CAPTURE = 1
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        databaseHelper = DatabaseHelper(this)
+        // Set up RecyclerView for displaying captured photos
+        photoAdapter = PhotoAdapter(photoList)
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = photoAdapter
 
-        val editTextDate = findViewById<EditText>(R.id.editTextDate)
-        val editTextSymptoms = findViewById<EditText>(R.id.editTextSymptoms)
-        val editTextMood = findViewById<EditText>(R.id.editTextMood)
-        val buttonSave = findViewById<Button>(R.id.buttonSave)
-        val entriesList = databaseHelper.getAllEntries()
-        val recyclerViewEntries = findViewById<RecyclerView>(R.id.recyclerViewEntries)
+        // Capture photo button click listener
+        binding.btnCapturePhoto.setOnClickListener {
+            capturePhoto()
+        }
+    }
 
-        recyclerViewEntries.layoutManager = LinearLayoutManager(this)
-        recyclerViewEntries.adapter = EntryAdapter(entriesList)
+    private fun capturePhoto() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        val photoFile: File? = createImageFile()
+        if (photoFile != null) {
+            val photoURI: Uri = FileProvider.getUriForFile(
+                this,
+                "${packageName}.fileprovider",  // Make sure to set this in your manifest
+                photoFile
+            )
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+            startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+        }
+    }
 
-        buttonSave.setOnClickListener {
-            val date = editTextDate.text.toString()
-            val symptoms = editTextSymptoms.text.toString()
-            val mood = editTextMood.text.toString()
+    private fun createImageFile(): File? {
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        val storageDir: File? = getExternalFilesDir(null)
+        return try {
+            val imageFile = File.createTempFile(
+                "JPEG_${timeStamp}_",  // Prefix
+                ".jpg",  // Suffix
+                storageDir   // Directory
+            )
+            currentPhotoPath = imageFile.absolutePath
+            imageFile
+        } catch (ex: IOException) {
+            Log.e("MainActivity", "Error creating image file: ${ex.message}")
+            null
+        }
+    }
 
-            if (date.isNotEmpty() && symptoms.isNotEmpty() && mood.isNotEmpty()) {
-                val result = databaseHelper.addEntry(date, symptoms, mood)
-                if (result != -1L) {
-                    Toast.makeText(this, "Entry Saved!", Toast.LENGTH_SHORT).show()
-                    editTextDate.text.clear()
-                    editTextSymptoms.text.clear()
-                    editTextMood.text.clear()
-                } else {
-                    Toast.makeText(this, "Error saving entry", Toast.LENGTH_SHORT).show()
-                }
-            } else {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            currentPhotoPath?.let { path ->
+                // Add the photo path to the list and update the RecyclerView
+                photoList.add(path)
+                photoAdapter.notifyDataSetChanged()
             }
         }
+    }
+
+    // Adapter for RecyclerView to display captured photos
+    class PhotoAdapter(private val photoList: List<String>) : RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
+            val binding = ListItemPhotoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            return PhotoViewHolder(binding)
+        }
+
+        override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
+            val photoPath = photoList[position]
+            // You can use Glide or Picasso to load images into ImageView here
+            holder.binding.imgPhoto.setImageURI(Uri.parse(photoPath))
+        }
+
+        override fun getItemCount(): Int = photoList.size
+
+        class PhotoViewHolder(val binding: ListItemPhotoBinding) : RecyclerView.ViewHolder(binding.root)
     }
 }
